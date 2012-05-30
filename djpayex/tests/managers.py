@@ -3,7 +3,7 @@ import datetime
 from django.conf import settings
 from django.test import TestCase
 
-from djpayex.models import InitializedPayment, TransactionStatus, AutoPayStatus
+from djpayex.models import InitializedPayment, TransactionStatus, Agreement, AutoPayStatus
 
 class InitializedPaymentTests(TestCase):
     
@@ -153,6 +153,46 @@ class TransactionStatusTests(TestCase):
         self.assertFalse(obj.frauddata)
         
         self.assertTrue(obj.is_completed_successfully())
+
+class AgreementTests(TestCase):
+    
+    def testManagerCreateResponse(self):
+        """
+        Test manager create method for creation of an agreement.
+        """
+        
+        response = {
+            'status': {
+                'errorCode': 'OK', 
+                'code': 'OK', 
+                'description': 'OK', 
+                'thirdPartyError': None, 
+                'paramName': None
+            }, 
+            'header': {
+                'date': '2012-05-30 16:10:28', 
+                'name': 'Payex Header v1.0', 
+                'id': '742abc499e9840ed8fa1faa317ef4370'
+            }, 
+            'agreementRef': '8a9c58a1b10641ed8fbfe345968bc062'
+        }
+        
+        # Don't save
+        obj = Agreement.objects.create_from_response(response, commit=False)
+        self.assertEquals(AutoPayStatus.objects.count(), 0)
+        
+        # Save as new object
+        obj = Agreement.objects.create_from_response(response)
+        self.assertEquals(Agreement.objects.count(), 1)
+        
+        # Check that fields are set
+        self.assertTrue(isinstance(obj.created, datetime.datetime))
+        self.assertTrue(isinstance(obj.updated, datetime.datetime))
+        self.assertEquals(obj.raw_response, response)
+        self.assertEquals(obj.errorcode, response['status']['errorCode'])
+        self.assertEquals(obj.description, response['status']['description'])
+        
+        self.assertEquals(obj.agreementref, '8a9c58a1b10641ed8fbfe345968bc062')
 
 class AutoPayTests(TestCase):
     

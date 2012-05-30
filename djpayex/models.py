@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from djpayex.managers import InitializedPaymentManager, TransactionStatusManager
+from djpayex.managers import InitializedPaymentManager, TransactionStatusManager, AgreementManager, AutoPayStatusManager
 
 
 class PayexResponse(models.Model):
@@ -106,6 +106,25 @@ class TransactionStatus(PayexResponse):
             return Decimal(self.amount) / 100
         
         return Decimal('0.00')
+
+class Agreement(PayexResponse):
+    """
+    Agreement between merchant and client.
+    """
+    
+    agreementref = models.CharField(_('agreementRef'), max_length=255, blank=True, help_text=_('Reference to the created agreement.'))
+    
+    # Information about the agreement given by the merchant upon creation
+    maxamount = models.CharField(_('maxAmount'), max_length=255, blank=True, help_text=_('One single transaction can never be greater than this amount.'))
+    
+    objects = AgreementManager()
+    
+    class Meta:
+        verbose_name = _('agreement')
+        verbose_name_plural = _('agreements')
+    
+    def __unicode__(self):
+        return _('Agreement %s') % self.agreementref
 
 class AutoPayStatus(PayexResponse):
     """
