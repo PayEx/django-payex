@@ -3,7 +3,7 @@ import datetime
 from django.conf import settings
 from django.test import TestCase
 
-from djpayex.models import InitializedPayment, TransactionStatus
+from djpayex.models import InitializedPayment, TransactionStatus, AutoPayStatus
 
 class InitializedPaymentTests(TestCase):
     
@@ -151,5 +151,51 @@ class TransactionStatusTests(TestCase):
         self.assertFalse(obj.pending)
         self.assertFalse(obj.alreadycompleted)
         self.assertFalse(obj.frauddata)
+        
+        self.assertTrue(obj.is_completed_successfully())
+
+class AutoPayTests(TestCase):
+    
+    def testAutoPayResponse(self):
+        """
+        Test manager create method for an autopay transaction.
+        """
+        
+        response = {
+            'status': {
+                'errorCode': 'OK', 
+                'code': 'OK', 
+                'description': 'OK', 
+                'thirdPartyError': None, 
+                'paramName': None
+            }, 
+            'header': {
+                'date': '2012-05-30 14:36:09', 
+                'name': 'Payex Header v1.0', 
+                'id': 'c7421744c7a24b448fd34caee0563cdb'
+            }, 
+            'transactionNumber': '041029056', 
+            'transactionRef': 'b23a5779df944b0dae745065dd1804f2', 
+            'paymentMethod': 'VISA', 
+            'transactionStatus': '0'
+        }
+        
+        # Don't save
+        obj = AutoPayStatus.objects.create_from_response(response, commit=False)
+        self.assertEquals(AutoPayStatus.objects.count(), 0)
+        
+        # Save as new object
+        obj = AutoPayStatus.objects.create_from_response(response)
+        self.assertEquals(AutoPayStatus.objects.count(), 1)
+        
+        # Check that fields are set
+        self.assertTrue(isinstance(obj.created, datetime.datetime))
+        self.assertTrue(isinstance(obj.updated, datetime.datetime))
+        self.assertEquals(obj.raw_response, response)
+        self.assertEquals(obj.errorcode, response['status']['errorCode'])
+        self.assertEquals(obj.description, response['status']['description'])
+        
+        self.assertEquals(obj.transactionnumber, '041029056')
+        self.assertEquals(obj.transactionstatus, '0')
         
         self.assertTrue(obj.is_completed_successfully())

@@ -63,3 +63,10 @@ class TransactionStatusManager(PayexResponseManager):
     """
     
     pass
+
+class AutoPayStatusManager(PayexResponseManager):
+    """
+    Manager for AutoPayStatus model.
+    """
+    
+    pass

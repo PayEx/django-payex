@@ -106,3 +106,30 @@ class TransactionStatus(PayexResponse):
             return Decimal(self.amount) / 100
         
         return Decimal('0.00')
+
+class AutoPayStatus(PayexResponse):
+    """
+    Status of an autopay performed on an agreement.
+    """
+    
+    # Transaction status
+    transactionstatus = models.CharField(_('transactionStatus'), max_length=255, blank=True, help_text=_('0=Sale, 1=Initialize, 2=Credit, 3=Authorize, 4=Cancel,5=Failure,6=Capture'))
+    transactionref = models.CharField(_('transactionRef'), max_length=255, blank=True, help_text=_('An ID to the transaction completed.'))
+    transactionnumber = models.CharField(_('transactionNumber'), max_length=255, blank=True, help_text=_('Transaction number if the transaction is successful.'))
+    paymentmethod = models.CharField(_('paymentMethod'), max_length=255, blank=True, help_text=_('Payment method used for this transaction.'))
+    
+    objects = AutoPayStatusManager()
+    
+    class Meta:
+        verbose_name = _('autopay status')
+        verbose_name_plural = _('autopay statuses')
+    
+    def __unicode__(self):
+        return _('Autopay status %s') % self.id
+    
+    def is_completed_successfully(self):
+        """
+        Checks if the transaction was completed successfully.
+        """
+        
+        return self.errorcode == 'OK' and self.transactionstatus in ('0', '3')
