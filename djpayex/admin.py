@@ -20,7 +20,7 @@ class InitializedPaymentAdmin(admin.ModelAdmin):
             'fields': ('raw_response', )
         }),
     )
-    list_display = ('__unicode__', 'orderref', 'created', )
+    list_display = ('__unicode__', 'errorcode', 'orderref', 'created', )
     list_filter = ('created', )
     search_fields = ('id', 'orderref', )
     #readonly_fields = InitializedPayment._meta.get_all_field_names()
@@ -76,7 +76,7 @@ class AgreementAdmin(admin.ModelAdmin):
             'fields': ('raw_response', )
         }),
     )
-    list_display = ('__unicode__', 'agreementref', 'created', )
+    list_display = ('__unicode__', 'errorcode', 'agreementref', 'created', )
     list_filter = ('created', )
     search_fields = ('id', 'agreementref', )
     #readonly_fields = Agreement._meta.get_all_field_names()
@@ -102,7 +102,7 @@ class AutoPayStatusAdmin(admin.ModelAdmin):
             'fields': ('raw_response', )
         }),
     )
-    list_display = ('__unicode__', 'transactionnumber', 'created', )
+    list_display = ('__unicode__', 'errorcode', 'transactionnumber', 'created', )
     list_filter = ('created', )
     search_fields = ('id', 'transactionnumber', )
     #readonly_fields = AutoPayStatus._meta.get_all_field_names()

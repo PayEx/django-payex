@@ -27,6 +27,9 @@ class PayexResponse(models.Model):
     class Meta:
         abstract = True
 
+##################
+# Payment models #
+##################
 
 class InitializedPayment(PayexResponse):
     """
@@ -107,6 +110,10 @@ class TransactionStatus(PayexResponse):
         
         return Decimal('0.00')
 
+####################
+# Agreement models #
+####################
+
 class Agreement(PayexResponse):
     """
     Agreement between merchant and client.
@@ -125,6 +132,28 @@ class Agreement(PayexResponse):
     
     def __unicode__(self):
         return _('Agreement %s') % self.agreementref
+    
+    def is_verified(self):
+        """
+        Checks with PayEx if the agreement is verified.
+        """
+        
+        from django.conf import settings
+        from payex.service import PayEx
+        
+        # Initialize service
+        service = PayEx(
+            merchant_number=settings.PAYEX_MERCHANT_NUMBER, 
+            encryption_key=settings.PAYEX_ENCRYPTION_KEY, 
+            production=settings.PAYEX_IN_PRODUCTION
+        )
+        
+        response = service.check_agreement(agreementRef=self.agreementref)
+        
+        if response['status']['description'] == 'OK':
+            return response['agreementStatus'] == '1'
+        
+        return False
 
 class AutoPayStatus(PayexResponse):
     """

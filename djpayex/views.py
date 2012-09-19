@@ -7,7 +7,13 @@ from payex.service import PayEx
 from djpayex.models import TransactionStatus
 
 logger = logging.getLogger(__name__)
-service = PayEx(merchant_number=settings.PAYEX_MERCHANT_NUMBER, encryption_key=settings.PAYEX_ENCRYPTION_KEY, production=settings.PAYEX_IN_PRODUCTION)
+
+# Initialize PayEx service
+service = PayEx(
+    merchant_number=settings.PAYEX_MERCHANT_NUMBER, 
+    encryption_key=settings.PAYEX_ENCRYPTION_KEY, 
+    production=settings.PAYEX_IN_PRODUCTION
+)
 
 def callback(request):
     """
@@ -21,7 +27,7 @@ def callback(request):
     Response from merchant:
         HTTP 200 OK or FAILURE. On "FAILURE" PayEx will retry the HTTP POST-request 5 times, with approximately 15 minutes interval
     
-    Docs:
+    Documentation:
     http://www.payexpim.com/quick-guide/9-transaction-callback/
     """
     
