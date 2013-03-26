@@ -16,12 +16,12 @@ setup(
     version=__version__,
     description='Django application for saving statuses and receiving callbacks from the PayEx API.',
     long_description=open('README.md').read(),
-    author='Funkbit AS',
+    author='Funkbit',
     author_email='post@funkbit.no',
     url='https://github.com/funkbit/django-payex',
-    packages=['djpayex',],
+    packages=['djpayex', ],
     license='BSD',
-    classifiers = (
+    classifiers=(
         "Development Status :: 3 - Alpha",
         "Framework :: Django",
         "Intended Audience :: Developers",
